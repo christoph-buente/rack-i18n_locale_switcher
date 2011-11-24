@@ -1,0 +1,11 @@
+.DS_Store
+.bundle
+.rbenv-version
+vendor/bundle
+*.tmproj
+tmp/**/*
+log/*
+pkg
+doc
+.yardoc
+Gemfile.lock

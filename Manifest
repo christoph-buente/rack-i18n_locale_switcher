@@ -1,0 +1,5 @@
+Rakefile
+lib/rack/i18n_locale_switcher.rb
+spec/i18n_locale_switcher_test.rb
+spec/spec_helper.rb
+Manifest
