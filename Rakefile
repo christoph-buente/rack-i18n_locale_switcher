@@ -20,7 +20,7 @@ Echoe.new('rack-i18n_locale_switcher', '0.1.0') do |p|
    *.tmproj
  }
 
- p.runtime_dependencies     = [ "rack", "i18n" ]
+ p.runtime_dependencies     = [ "rack", "i18n", "domainatrix" ]
  p.development_dependencies = [ "echoe", "rspec", "rack-test" ]
 end
 

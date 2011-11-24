@@ -1,4 +1,6 @@
 require 'i18n'
+require 'domainatrix'
+
 module Rack
   class I18nLocaleSwitcher
     def initialize(app, options = {})
@@ -6,24 +8,11 @@ module Rack
     end
 
     def call(env)
-      request = Rack::Request.new env
+      request = Rack::Request.new(env)
 
       session = request.session
-      locale = extract_locale_from_path_or_params(request)
-
-      if locale == I18n.default_locale
-        session["locale"] = locale
-        path = request.fullpath.gsub(/\/#{locale}\b/, '')
-        # ignore paths given with except option
-        unless request.fullpath =~ %r{/tolk/|/api/}
-          return [ 302, {'Location'=> "#{request.scheme}://#{request.host_with_port}#{path}" }, [] ]
-        end
-      end
-
-      session["locale"] = locale if is_present?(locale)
-      session["locale"] = first_http_accept_language(env) unless is_present?(session["locale"])
-
-      I18n.locale = session["locale"]
+      locale = extract_locale(request)
+      I18n.locale = session["locale"] = (is_present?(locale) ? locale : I18n.default_locale)
 
       @app.call cleanup_env(env)
     end
@@ -45,8 +34,43 @@ module Rack
       end
     end
 
-    def extract_locale_from_path_or_params(request)
-      symbolize_locale( extract_locale_from_path(request) || extract_locale_from_params(request) )
+    def extract_locale_from_tld(request)
+      locale = Domainatrix.parse(request.url).public_suffix rescue nil
+      locale if is_available?(locale)
+    end
+
+    def extract_locale_from_subdomain(request)
+      locale = Domainatrix.parse(request.url).subdomain rescue nil
+      locale if is_available?(locale)
+    end
+
+    def extract_locale_from_session(request)
+      locale = request.session['locale']
+      locale if is_available?(locale)
+    end
+
+    def extract_locale_from_accept_language(request)
+      if lang = request.env["HTTP_ACCEPT_LANGUAGE"]
+        lang = lang.split(",").map { |l|
+          l += ';q=1.0' unless l =~ /;q=\d+\.\d+$/
+          l.split(';q=')
+        }.first
+        locale = symbolize_locale(lang.first.split("-").first)
+      else
+        locale = I18n.default_locale
+      end
+      is_available?(locale) ? locale : I18n.default_locale
+    end
+
+
+    def extract_locale(request)
+      locale = (  extract_locale_from_params(request)           ||
+                  extract_locale_from_path(request)             ||
+                  extract_locale_from_subdomain(request)        ||
+                  extract_locale_from_tld(request)              ||
+                  extract_locale_from_session(request)          ||
+                  extract_locale_from_accept_language(request))
+      symbolize_locale(locale)
     end
 
     def cleanup_env env
@@ -59,25 +83,13 @@ module Rack
       env
     end
 
-    def first_http_accept_language(env)
-      if lang = env["HTTP_ACCEPT_LANGUAGE"]
-        lang = lang.split(",").map { |l|
-          l += ';q=1.0' unless l =~ /;q=\d+\.\d+$/
-          l.split(';q=')
-        }.first
-        locale = symbolize_locale(lang.first.split("-").first)
-      else
-        locale = nil
-      end
-      is_available?(locale) ? locale : I18n.available_locales
-    end
 
     def is_present?(value)
       !value.to_s.empty?
     end
 
     def symbolize_locale(locale)
-      is_present?(locale) ?  locale.to_s.downcase.to_sym : locale
+      (is_present?(locale) ?  locale.to_s.downcase.to_sym : nil)
     end
 
   end

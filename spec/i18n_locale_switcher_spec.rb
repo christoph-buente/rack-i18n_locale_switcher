@@ -3,7 +3,7 @@ require "spec_helper"
 describe "Rack::I18nLocaleSwitcher" do
 
   before do
-    I18n.available_locales = [:en, :'en-US', :de, :'de-DE']
+    I18n.available_locales = [:en, :'en-US', :de, :'de-DE', :es]
     I18n.default_locale = :en
   end
 
@@ -45,47 +45,37 @@ describe "Rack::I18nLocaleSwitcher" do
 
   context 'from subdomain' do
 
-    before do
-      default_host = 'de.example.com'
-    end
-
-    xit "should set the I18n locale" do
-      get '/'
+    it "should set the I18n locale" do
+      get 'http://de.example.com/'
       I18n.locale.should eql(:de)
     end
   end
 
   context 'from top level domain' do
 
-    before do
-      default_host = 'example.de'
 
-      it "should set the I18n locale" do
-        get '/'
-        I18n.locale.should eql(:de)
-      end
+    it "should set the I18n locale" do
+      get 'http://example.de/'
+      I18n.locale.should eql(:de)
     end
-
 
   end
 
   context 'from accept-language header' do
 
     it "should override the client requested locale" do
-      header "Accept-Language", "de, en"
-      get '/'
+      get '/' , {}, {'HTTP_ACCEPT_LANGUAGE' => "de, de-de,en;q=0.5"}
       I18n.locale.should eql(:de)
     end
 
   end
 
   context 'from session' do
-    xit "should override the users session locale" do
-      request.session['locale'] = :de
-      get '/', :locale => 'en'
-      I18n.locale.should eql(:en)
-    end
+    it "should set the locale to whatever locale is set in the session" do
 
+      get '/', {}, {'rack.session' => {'locale' => 'de'}}
+      I18n.locale.should eql(:de)
+    end
 
   end
 
