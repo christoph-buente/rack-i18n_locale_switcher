@@ -1,5 +1,9 @@
+CHANGELOG
+LICENSE
+Manifest
+README.md
 Rakefile
 lib/rack/i18n_locale_switcher.rb
-spec/i18n_locale_switcher_test.rb
+rack-i18n_locale_switcher.gemspec
+spec/i18n_locale_switcher_spec.rb
 spec/spec_helper.rb
-Manifest

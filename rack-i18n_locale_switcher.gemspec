@@ -9,10 +9,10 @@ Gem::Specification.new do |s|
   s.date = "2011-11-24"
   s.description = "Detects the current locale from url, domain, parameter, session or accept header."
   s.email = ["info@christophbuente.de", "andreas.korth@gmail.com"]
-  s.extra_rdoc_files = ["lib/rack/i18n_locale_switcher.rb"]
-  s.files = ["Rakefile", "lib/rack/i18n_locale_switcher.rb", "spec/i18n_locale_switcher_test.rb", "spec/spec_helper.rb", "Manifest", "rack-i18n_locale_switcher.gemspec"]
+  s.extra_rdoc_files = ["CHANGELOG", "LICENSE", "README.md", "lib/rack/i18n_locale_switcher.rb"]
+  s.files = ["CHANGELOG", "LICENSE", "Manifest", "README.md", "Rakefile", "lib/rack/i18n_locale_switcher.rb", "rack-i18n_locale_switcher.gemspec", "spec/i18n_locale_switcher_spec.rb", "spec/spec_helper.rb"]
   s.homepage = "http://github.com/christoph-buente/rack-i18n_locale_switcher"
-  s.rdoc_options = ["--line-numbers", "--inline-source", "--title", "Rack-i18n_locale_switcher"]
+  s.rdoc_options = ["--line-numbers", "--inline-source", "--title", "Rack-i18n_locale_switcher", "--main", "README.md"]
   s.require_paths = ["lib"]
   s.rubyforge_project = "rack-i18n_locale_switcher"
   s.rubygems_version = "1.8.11"
