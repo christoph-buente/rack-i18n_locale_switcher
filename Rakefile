@@ -2,7 +2,7 @@
 require 'rake'
 require 'echoe'
 
-Echoe.new('rack-i18n_locale_switcher', '0.2.0') do |p|
+Echoe.new('rack-i18n_locale_switcher', '0.2.1') do |p|
 
  p.description     = "Detects the current locale from url, domain, parameter, session or accept header."
  p.url             = "http://github.com/christoph-buente/rack-i18n_locale_switcher"
@@ -35,4 +35,4 @@ RSpec::Core::RakeTask.new(:rcov) do |spec|
  spec.rcov = true
 end
 
-task default: :spec
+task :default => :spec
