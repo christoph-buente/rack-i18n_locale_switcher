@@ -20,7 +20,7 @@ module Rack
     private
 
     def is_available?(locale)
-      locale ? I18n.available_locales.include?(locale.to_sym) : false
+      (locale.nil? ||locale == '') ? false : I18n.available_locales.include?(locale.to_sym)
     end
 
     def extract_locale_from_params(request)
