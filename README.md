@@ -24,7 +24,7 @@ Sound's good, gimme the code!
     require  'rack/i18n_locale_switcher'
     config.middleware.use(Rack::I18nLocaleSwitcher)
 
-Sinatra
+## Sinatra
 
     require 'rack/i18n_locale_switcher'
     use Rack::I18nLocaleSwitcher, :i18n_locale_switcher
@@ -36,5 +36,4 @@ Sinatra
 
   [1]: http://travis-ci.org/#!/christoph-buente/rack-i18n_locale_switcher
   [2]: https://secure.travis-ci.org/christoph-buente/rack-i18n_locale_switcher.png
-  
-  
+
