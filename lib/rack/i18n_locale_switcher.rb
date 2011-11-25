@@ -9,11 +9,8 @@ module Rack
 
     def call(env)
       request = Rack::Request.new(env)
-
-      session = request.session
       locale = extract_locale(request)
-      I18n.locale = session["locale"] = (is_present?(locale) ? locale : I18n.default_locale)
-
+      I18n.locale = (is_present?(locale) ? locale : I18n.default_locale)
       @app.call cleanup_env(env)
     end
 
@@ -44,11 +41,6 @@ module Rack
       locale if is_available?(locale)
     end
 
-    def extract_locale_from_session(request)
-      locale = request.session['locale']
-      locale if is_available?(locale)
-    end
-
     def extract_locale_from_accept_language(request)
       if lang = request.env["HTTP_ACCEPT_LANGUAGE"]
         lang = lang.split(",").map { |l|
@@ -68,7 +60,6 @@ module Rack
                   extract_locale_from_path(request)             ||
                   extract_locale_from_subdomain(request)        ||
                   extract_locale_from_tld(request)              ||
-                  extract_locale_from_session(request)          ||
                   extract_locale_from_accept_language(request))
       symbolize_locale(locale)
     end

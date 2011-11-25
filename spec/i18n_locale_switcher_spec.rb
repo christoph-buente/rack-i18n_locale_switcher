@@ -33,7 +33,6 @@ describe "Rack::I18nLocaleSwitcher" do
       get '/', :locale => 'xx'
       I18n.locale.should eql(I18n.default_locale)
     end
-
   end
 
   context 'from path prefix ' do
@@ -53,12 +52,10 @@ describe "Rack::I18nLocaleSwitcher" do
 
   context 'from top level domain' do
 
-
     it "should set the I18n locale" do
       get 'http://example.de/'
       I18n.locale.should eql(:de)
     end
-
   end
 
   context 'from accept-language header' do
@@ -67,19 +64,5 @@ describe "Rack::I18nLocaleSwitcher" do
       get '/' , {}, {'HTTP_ACCEPT_LANGUAGE' => "de, de-de,en;q=0.5"}
       I18n.locale.should eql(:de)
     end
-
   end
-
-  context 'from session' do
-    it "should set the locale to whatever locale is set in the session" do
-
-      get '/', {}, {'rack.session' => {'locale' => 'de'}}
-      I18n.locale.should eql(:de)
-    end
-
-  end
-
-  context 'from default' do
-  end
-
 end

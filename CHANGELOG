@@ -1,3 +1,6 @@
+= 0.3.0
+  Removed support for storing the locale in the session
+
 = 0.2.0 / 2011-11-24
   Better test coverage
 

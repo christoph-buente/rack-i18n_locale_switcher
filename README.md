@@ -19,7 +19,6 @@ To extract the correct language from such a request, you probably don't want to 
 * url path (tr, turkish)
 * subdomain (es, spanish)
 * top level domain (it, italian)
-* session parameter (not visible in the url, but could be something completely different)
 * HTTP Accept-language header (not visible in the url, but could be something completely different)
 
 Sound's good, gimme the code!
