@@ -5,11 +5,6 @@ describe Rack::I18nLocaleSwitcher do
 
   include Rack::Test::Methods
 
-  before do
-    I18n.available_locales = [:en, :'en-US', :de, :'de-DE', :es]
-    I18n.default_locale = :en
-  end
-
   def app
     Rack::Builder.new {
       map "/" do
@@ -19,12 +14,17 @@ describe Rack::I18nLocaleSwitcher do
     }.to_app
   end
 
-  it "should set the locate to default locale" do
+  before do
+    I18n.available_locales = [:en, :'en-US', :de, :'de-DE', :es]
+    I18n.default_locale = :en
+  end
+
+  it "should set the locale to default locale" do
     get '/'
     I18n.locale.should eql(I18n.default_locale)
   end
 
-  context 'from request params' do
+  context 'request param' do
 
     it "should set the I18n locale" do
       get '/', :locale => 'de'
@@ -32,13 +32,14 @@ describe Rack::I18nLocaleSwitcher do
       I18n.locale.should eql(:de)
     end
 
-    it "should disallow other locales than the available locales" do
+    it "should only allow available locales" do
       get '/', :locale => 'xx'
       I18n.locale.should eql(I18n.default_locale)
     end
   end
 
   context 'from path prefix ' do
+
     it "should set the I18n locale" do
       get '/de/'
       I18n.locale.should eql(:de)

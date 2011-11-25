@@ -2,9 +2,9 @@
 require 'rake'
 require 'echoe'
 
-Echoe.new('rack-i18n_locale_switcher', '0.3.0') do |p|
+Echoe.new('rack-i18n_locale_switcher', '0.3.1') do |p|
 
- p.description     = "Detects the current locale from url, domain, parameter or accept header."
+ p.description     = "Detects the current locale from host, top level domain, query parameter or Accept-Language header."
  p.url             = "http://github.com/christoph-buente/rack-i18n_locale_switcher"
  p.author          = ["Christoph Bünte", "Andreas Korth"]
  p.email           = ["info@christophbuente.de", "andreas.korth@gmail.com"]

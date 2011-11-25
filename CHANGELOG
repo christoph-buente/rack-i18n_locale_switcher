@@ -1,4 +1,8 @@
-= 0.3.0
+= 0.3.1 / 2011-11-25
+  Code refactoring
+  Don't "clean" then Rack environment
+  
+= 0.3.0 / 2011-11-25
   Removed support for storing the locale in the session
 
 = 0.2.0 / 2011-11-24

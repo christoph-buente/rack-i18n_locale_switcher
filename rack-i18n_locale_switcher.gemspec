@@ -2,21 +2,21 @@
 
 Gem::Specification.new do |s|
   s.name = "rack-i18n_locale_switcher"
-  s.version = "0.3.0"
+  s.version = "0.3.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 1.2") if s.respond_to? :required_rubygems_version=
   s.authors = ["Christoph B\u{fc}nte, Andreas Korth"]
   s.date = "2011-11-25"
-  s.description = "Detects the current locale from url, domain, parameter or accept header."
+  s.description = "Detects the current locale from host, top level domain, query parameter or Accept-Language header."
   s.email = ["info@christophbuente.de", "andreas.korth@gmail.com"]
   s.extra_rdoc_files = ["CHANGELOG", "LICENSE", "README.md", "lib/rack/i18n_locale_switcher.rb"]
-  s.files = ["CHANGELOG", "LICENSE", "Manifest", "README.md", "Rakefile", "lib/rack/i18n_locale_switcher.rb", "rack-i18n_locale_switcher.gemspec", "spec/i18n_locale_switcher_spec.rb", "spec/spec_helper.rb"]
+  s.files = ["CHANGELOG", "LICENSE", "Manifest", "README.md", "Rakefile", "lib/rack/i18n_locale_switcher.rb", "rack-i18n_locale_switcher.gemspec", "spec/i18n_locale_switcher_spec.rb"]
   s.homepage = "http://github.com/christoph-buente/rack-i18n_locale_switcher"
   s.rdoc_options = ["--line-numbers", "--inline-source", "--title", "Rack-i18n_locale_switcher", "--main", "README.md"]
   s.require_paths = ["lib"]
   s.rubyforge_project = "rack-i18n_locale_switcher"
   s.rubygems_version = "1.8.11"
-  s.summary = "Detects the current locale from url, domain, parameter or accept header."
+  s.summary = "Detects the current locale from host, top level domain, query parameter or Accept-Language header."
 
   if s.respond_to? :specification_version then
     s.specification_version = 3
