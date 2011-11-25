@@ -6,4 +6,3 @@ Rakefile
 lib/rack/i18n_locale_switcher.rb
 rack-i18n_locale_switcher.gemspec
 spec/i18n_locale_switcher_spec.rb
-spec/spec_helper.rb

@@ -1,6 +1,9 @@
-require "spec_helper"
+require 'rack/i18n_locale_switcher'
+require 'rack/test'
 
-describe "Rack::I18nLocaleSwitcher" do
+describe Rack::I18nLocaleSwitcher do
+
+  include Rack::Test::Methods
 
   before do
     I18n.available_locales = [:en, :'en-US', :de, :'de-DE', :es]
