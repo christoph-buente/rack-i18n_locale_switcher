@@ -1,3 +1,9 @@
+= 0.4.0 / 2011-11-26
+  Added support configuration of sources from which to determine the locale
+  as well as the name of the query parameter.
+  Drop support for TLD since locale can't be reliably inferred from it
+  Code refactoring and better test coverage.
+  
 = 0.3.1 / 2011-11-25
   Code refactoring
   Don't "clean" then Rack environment

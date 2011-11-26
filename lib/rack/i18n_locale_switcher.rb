@@ -1,57 +1,72 @@
 require 'i18n'
-require 'domainatrix'
+# require 'domainatrix'
 
 module Rack
   class I18nLocaleSwitcher
     
+    DEFAULT_OPTIONS = {
+      :param  => 'locale',
+      :source => [ :param, :path, :host, :header ]
+    }.freeze
+
     def initialize(app, options = {})
       @app = app
+      
+      invalid_options = (options.keys - DEFAULT_OPTIONS.keys)
+      
+      if invalid_options.any?
+        raise ArgumentError, "Invalid option(s) #{ invalid_options.map(&:inspect).join(', ') }" 
+      end
+      
+      @options = DEFAULT_OPTIONS.merge(options)
+      @options[:source] = Array(@options[:source]) unless @options[:source].is_a?(Array)
     end
 
     def call(env)
-      I18n.locale = extract_locale(env)
+      I18n.locale = I18n.default_locale
+      
+      @options[:source].each do |source|
+        if locale = send(:"get_locale_from_#{source}", env)
+          I18n.locale = locale
+          break
+        end
+      end
+            
       @app.call(env)
     end
 
     private
 
-    def extract_locale(env)
-      request = Rack::Request.new(env)
-      uses = [ :param, :path, :subdomain, :tld, :client ]
-      uses.each do |use|
-        if locale = send(:"extract_locale_from_#{ use }", request)
-          unless locale.empty?
-            locale = locale.to_sym
-            return locale if I18n.available_locales.include?(locale)
-          end
+    def get_locale_from_param(env)
+      env['QUERY_STRING'] =~ /\b#{ @options[:param] }=([^&]+)\b/
+      to_available_locale($1)
+    end
+
+    def get_locale_from_path(env)
+      env['PATH_INFO'] =~ /^\/([^\/]+)/
+      to_available_locale($1)
+    end
+
+    def get_locale_from_host(env)
+      env['SERVER_NAME'] =~ /^([^.]+)\.[^.]+\.[^.]+/i
+      to_available_locale($1)
+    end
+
+    def get_locale_from_header(env)
+      locale = nil
+      if accept = env['HTTP_ACCEPT_LANGUAGE']
+        locales = accept.scan(/([^;,]+)\s*(;\s*q\s*=\s*(1|0\.[0-9]+))?/i)
+        locales.sort_by{ |loc| 1 - (loc.last || 1).to_f }.each do |loc|
+          break if locale = to_available_locale(loc.first)
         end
       end
-      I18n.default_locale
+      locale
     end
-
-    def extract_locale_from_param(request)
-      request.params["locale"]
-    end
-
-    def extract_locale_from_path(request)
-      request.path_info =~ /^\/(\w{2,3})\b/ && $1
-    end
-
-    def extract_locale_from_tld(request)
-      Domainatrix.parse(request.url).public_suffix rescue nil
-    end
-
-    def extract_locale_from_subdomain(request)
-      Domainatrix.parse(request.url).subdomain rescue nil
-    end
-
-    def extract_locale_from_client(request)
-      if lang = request.env["HTTP_ACCEPT_LANGUAGE"]
-        lang = lang.split(",").map { |l|
-          l += ';q=1.0' unless l =~ /;q=\d+\.\d+$/
-          l.split(';q=')
-        }.first
-        lang.first.split("-").first
+    
+    def to_available_locale(locale)
+      if locale =~ /^([a-z]{1,8})(-[a-z]{1,8})?$/i
+        locale = :"#{ $1.downcase }#{ ($2 || '').upcase }"
+        locale if I18n.available_locales.include?(locale)
       end
     end
   end
