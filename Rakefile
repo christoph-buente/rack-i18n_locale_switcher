@@ -2,7 +2,7 @@
 require 'rake'
 require 'echoe'
 
-Echoe.new('rack-i18n_locale_switcher', '0.4.0') do |p|
+Echoe.new('rack-i18n_locale_switcher', '0.5.0') do |p|
 
  p.description = "Detects the current locale from query parameter, path prefix, host or accept header."
  p.url         = "http://github.com/christoph-buente/rack-i18n_locale_switcher"
@@ -20,7 +20,7 @@ Echoe.new('rack-i18n_locale_switcher', '0.4.0') do |p|
    *.tmproj
  }
 
- p.runtime_dependencies     = [ "rack", "i18n", "domainatrix" ]
+ p.runtime_dependencies     = [ "rack", "i18n" ]
  p.development_dependencies = [ "echoe", "rspec", "rack-test" ]
 end
 
