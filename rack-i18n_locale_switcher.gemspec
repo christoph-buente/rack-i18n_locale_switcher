@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{rack-i18n_locale_switcher}
-  s.version = "0.5.0"
+  s.version = "0.5.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 1.2") if s.respond_to? :required_rubygems_version=
   s.authors = ["Christoph B\303\274nte, Andreas Korth"]

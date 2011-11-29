@@ -3,7 +3,7 @@ require 'i18n'
 module Rack
   class I18nLocaleSwitcher
     
-    LOCALE_PATTERN = '([a-z]{1,8})(-[a-zA-Z]{1,8})?'.freeze
+    LOCALE_PATTERN = '([a-zA-Z]{2,3})(-[a-zA-Z]{2,3})?'.freeze
     
     SOURCES   = [ :param, :path, :host, :header ].freeze
     REDIRECTS = [ :param, :path, :host ].freeze
@@ -125,14 +125,12 @@ module Rack
     end
 
     def set_locale_in_path(env)
-      env['PATH_INFO'] = "/#{ I18n.locale }#{ env['PATH_INFO'] }"
-      env['PATH_INFO'].gsub!(/\/$/, '')
+      env['PATH_INFO'] = "/#{ I18n.locale }#{ env['PATH_INFO'] }".gsub(/\/$/, '')
     end
 
     def set_locale_in_host(env)
-      ['HTTP_HOST', 'SERVER_NAME'].each do |key|
-        env[ key ] = "#{ I18n.locale }.#{ env[ key ] }"
-      end
+      env['HTTP_HOST']   = "#{ I18n.locale }.#{ env['HTTP_HOST'] }"
+      env['SERVER_NAME'] = "#{ I18n.locale }.#{ env['SERVER_NAME'] }"
     end
     
     def available_locale(language, region)
