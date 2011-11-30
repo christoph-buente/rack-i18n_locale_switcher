@@ -2,11 +2,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{rack-i18n_locale_switcher}
-  s.version = "0.5.1"
+  s.version = "0.5.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 1.2") if s.respond_to? :required_rubygems_version=
   s.authors = ["Christoph B\303\274nte, Andreas Korth"]
-  s.date = %q{2011-11-29}
+  s.date = %q{2011-11-30}
   s.description = %q{Detects the current locale from query parameter, path prefix, host or accept header.}
   s.email = ["info@christophbuente.de", "andreas.korth@gmail.com"]
   s.extra_rdoc_files = ["CHANGELOG", "LICENSE", "README.md", "lib/rack/i18n_locale_switcher.rb"]

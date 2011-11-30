@@ -28,6 +28,10 @@ as will the following request:
 
     require  'rack/i18n_locale_switcher'
     config.middleware.use Rack::I18nLocaleSwitcher
+    
+If you use Rails 3.1 with the asset pipeline, make sure you exclude the path to assets:
+
+    config.middleware.use Rack::I18nLocaleSwitcher, :except => /^\/assets/
 
 ### Using it with Sinatra
 
@@ -70,6 +74,12 @@ To avoid this, you can set the `canonical` option resulting in requests to be re
 
 In this configuration, requests to `http://en.example.org` will be redirected to `http://example.org` (provided you have set `I18n.default_locale` to `:en`).
 
+### Exceptions
+
+If you would like to exclude certain paths from locale switcher, just pass a regex matching these paths in the `except` option.
+
+    use Rack::I18nLocaleSwitcher, :redirect => :path, :except => /^\/(assets|static)\b/
+
 
 ## Configuring I18n
 
@@ -80,6 +90,7 @@ You have to define which locales are actually supported by your application. In 
 You should also set the default locale to which Locale Switcher will fall back in case the locale can't be determined. This setting is also important if you use canonical URLs (see above).
 
     I18n.default_locale = :de
+
 
 ## Feedback and Contributions
 

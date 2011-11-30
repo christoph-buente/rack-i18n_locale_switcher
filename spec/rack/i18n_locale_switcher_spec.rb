@@ -294,5 +294,22 @@ describe Rack::I18nLocaleSwitcher do
 
       it_should_behave_like "a redirect with the default locale"
     end
+    
+    context "exceptions" do
+
+      let :options do
+        { :redirect => :path, :except => /^\/assets/ }
+      end
+      
+      it "should not redirect if the path is exempt" do
+        [ "http://example.com/assets",   
+          "http://de.example.com/assets/foo/bar",
+          "http://example.com/assets/"
+        ].each do |url|
+          get url
+          last_response.should_not be_redirect
+        end
+      end
+    end
   end
 end

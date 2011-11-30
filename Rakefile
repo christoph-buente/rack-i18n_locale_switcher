@@ -2,7 +2,7 @@
 require 'rake'
 require 'echoe'
 
-Echoe.new('rack-i18n_locale_switcher', '0.5.1') do |p|
+Echoe.new('rack-i18n_locale_switcher', '0.5.2') do |p|
 
  p.description = "Detects the current locale from query parameter, path prefix, host or accept header."
  p.url         = "http://github.com/christoph-buente/rack-i18n_locale_switcher"

@@ -12,7 +12,8 @@ module Rack
       :param     => 'locale',
       :source    => SOURCES,
       :redirect  => nil,
-      :canonical => false
+      :canonical => false,
+      :except    => nil
     }.freeze
 
     def initialize(app, options = {})
@@ -28,6 +29,7 @@ module Rack
 
       @param     = options[:param]
       @canonical = options[:canonical]
+      @except    = options[:except]
 
       @sources = options[:source]      
       @sources = Array(@sources) unless @sources.is_a?(Array)
@@ -46,10 +48,12 @@ module Rack
     end
 
     def call(env)
+      return @app.call(env) if env['PATH_INFO'] =~ @except
+      
       I18n.locale = I18n.default_locale
-      
+    
       env['PATH_INFO'].gsub!(/([^\/])\/$/, '\1')
-      
+    
       request = Rack::Request.new(env)
       request_url = request.url
 
@@ -61,12 +65,12 @@ module Rack
           I18n.locale = locale
         end
       end
-      
+    
       if @redirect
         unless @canonical && I18n.locale == I18n.default_locale
           send(:"set_locale_in_#@redirect", env)
         end
-        
+      
         if request.url != request_url
           env['PATH_INFO'] = '' if env['PATH_INFO'] == '/'
           return [ 301, { 'Location' => request.url }, ["Redirecting"]]
