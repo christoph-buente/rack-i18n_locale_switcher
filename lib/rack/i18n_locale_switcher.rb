@@ -85,7 +85,7 @@ module Rack
 
       if @save_to_cookie
         status, headers, body, *rest = @app.call(env)
-         save_locale_in_cookies(headers) if @save_to_cookie
+        save_locale_in_cookies(headers)
         [status, headers, body, *rest]
       else
         @app.call(env)
@@ -135,11 +135,15 @@ module Rack
       locale
     end
 
+    REGEXP_LOCALE_PATTERN = Regexp.new(LOCALE_PATTERN)
+
     def extract_locale_from_cookie(env)
-      return unless (env_cookies = parse_cookies(env))
-      return unless (cookie = env_cookies[@cookie])
-      return unless Regexp.new(LOCALE_PATTERN).match(cookie)
+      return unless REGEXP_LOCALE_PATTERN.match(cookies(env)[@cookie])
       available_locale($1, $2)
+    end
+
+    def cookies(env)
+      parse_cookies(env) || {}
     end
 
     def set_locale_in_param(env)

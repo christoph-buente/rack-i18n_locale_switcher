@@ -332,18 +332,14 @@ describe Rack::I18nLocaleSwitcher do
     end
 
     [
-      ["path", "http://example.com/es"],
+      ["path", "http://example.com/es", {}, {}],
       ["param", "http://example.com", { 'locale' => 'es' }, {}],
-      ["host", "http://es.example.com"],
+      ["host", "http://es.example.com", {}, {}],
       ["headers", "http://example.com", {}, { "HTTP_ACCEPT_LANGUAGE" => "es" }],
       ["cookie", "http://example.com", {}, { "HTTP_COOKIE" => "cookie_name_for_locale=es" }],
     ].each do |src, url, params, env|
       it "should set locale in the cookie header when reading from #{src}" do
-        if params || env
-          get url, params, env
-        else
-          get url
-        end
+        get url, params, env
         I18n.locale.should eq(:es)
         last_response.header.should include("Set-Cookie")
         last_response.header["Set-Cookie"].should match(/cookie_name_for_locale/)
