@@ -63,14 +63,9 @@ module Rack
       request = Rack::Request.new(env)
       request_url = request.url
 
-      source = nil
-      @sources.each do |src|
-        locale = send(:"extract_locale_from_#{src}", env)
-        if locale && source.nil?
-          source = src
-          I18n.locale = locale
-        end
-      end
+      I18n.locale = @sources.to_enum.map do |src|
+        send(:"extract_locale_from_#{src}", env)
+      end.find {|e| !!e} || I18n.default_locale
 
       if @redirect
         unless @canonical && I18n.locale == I18n.default_locale
@@ -161,7 +156,7 @@ module Rack
     end
 
     def save_locale_in_cookies(headers)
-      set_cookie_header!(headers, @cookie, I18n.locale)
+      set_cookie_header!(headers, @cookie, { value: I18n.locale, path: '/'})
     end
 
     def available_locale(language, region)
