@@ -14,7 +14,7 @@ describe Rack::I18nLocaleSwitcher do
     rack = Rack::Builder.new do
       map "/" do
         use Rack::I18nLocaleSwitcher, opts
-        run lambda {|env| [200, {}, "Coolness"]}
+        run lambda { |env| [200, {}, "Coolness"] }
       end
     end
     rack.to_app
@@ -39,7 +39,7 @@ describe Rack::I18nLocaleSwitcher do
     }.to raise_error(ArgumentError, "Invalid option(s) :not_an_option")
 
     expect {
-      Rack::I18nLocaleSwitcher.new("app", :source => [:not_a_source])
+      Rack::I18nLocaleSwitcher.new("app", :source => [ :not_a_source ])
     }.to raise_error(ArgumentError, "Invalid source(s) :not_a_source")
 
     expect {
@@ -50,14 +50,14 @@ describe Rack::I18nLocaleSwitcher do
   context "with custom sources" do
 
     let :options do
-      { :source => [:header, :host] }
+      { :source => [ :header, :host ] }
     end
 
     it "should honor the sequence" do
-      get "http://de.example.com", nil, { "HTTP_ACCEPT_LANGUAGE" => "es" }
+      get "http://de.example.com" , nil, {"HTTP_ACCEPT_LANGUAGE" => "es"}
       I18n.locale.should eql(:es)
 
-      get "http://de.example.com", nil, { "HTTP_ACCEPT_LANGUAGE" => "foo" }
+      get "http://de.example.com" , nil, {"HTTP_ACCEPT_LANGUAGE" => "foo"}
       I18n.locale.should eql(:de)
 
       get "http://de.example.com"
@@ -129,10 +129,10 @@ describe Rack::I18nLocaleSwitcher do
   context "from accept-language header" do
 
     it "should override the client requested locale" do
-      get "http://example.com", nil, { "HTTP_ACCEPT_LANGUAGE" => "de-de,de,en;q=0.5" }
+      get "http://example.com" , nil, {"HTTP_ACCEPT_LANGUAGE" => "de-de,de,en;q=0.5"}
       I18n.locale.should eql(:'de-DE')
 
-      get "http://example.com", nil, { "HTTP_ACCEPT_LANGUAGE" => "en;q=0.5,en-US;q=0.8,es;q=0.7" }
+      get "http://example.com" , nil, {"HTTP_ACCEPT_LANGUAGE" => "en;q=0.5,en-US;q=0.8,es;q=0.7"}
       I18n.locale.should eql(:'en-US')
     end
   end
@@ -165,7 +165,7 @@ describe Rack::I18nLocaleSwitcher do
     end
 
     it "should not redirect if the locale was set in the accept header" do
-      get "http://example.com", nil, { "HTTP_ACCEPT_LANGUAGE" => "en" }
+      get "http://example.com" , nil, {"HTTP_ACCEPT_LANGUAGE" => "en"}
       last_response.should_not be_redirect
     end
   end
@@ -190,9 +190,9 @@ describe Rack::I18nLocaleSwitcher do
 
     it "should redirect if the locale was set by other means" do
       {
-        "http://en.example.com" => "http://example.com/en",
-        "http://en.example.com/de" => "http://example.com/de",
-        "http://de.example.com" => "http://example.com/de",
+        "http://en.example.com"        => "http://example.com/en",
+        "http://en.example.com/de"     => "http://example.com/de",
+        "http://de.example.com"        => "http://example.com/de",
         "http://example.com?locale=de" => "http://example.com/de"
       }.each do |url, redirect_url|
         get url
@@ -202,7 +202,7 @@ describe Rack::I18nLocaleSwitcher do
     end
 
     it "should redirect if the locale was set with an accept header" do
-      get "http://example.com", nil, { "HTTP_ACCEPT_LANGUAGE" => "de" }
+      get "http://example.com" , nil, {"HTTP_ACCEPT_LANGUAGE" => "de"}
       last_response.should be_redirect
       last_response.location.should eql("http://example.com/de")
     end
@@ -236,9 +236,9 @@ describe Rack::I18nLocaleSwitcher do
 
     it "should redirect if the locale was set by other means" do
       {
-        "http://example.com/en" => "http://en.example.com",
-        "http://en.example.com/de" => "http://de.example.com",
-        "http://example.com/de" => "http://de.example.com",
+        "http://example.com/en"        => "http://en.example.com",
+        "http://en.example.com/de"     => "http://de.example.com",
+        "http://example.com/de"        => "http://de.example.com",
         "http://example.com?locale=de" => "http://de.example.com"
       }.each do |url, redirect_url|
         get url
@@ -248,7 +248,7 @@ describe Rack::I18nLocaleSwitcher do
     end
 
     it "should redirect if the locale was set with an accept header" do
-      get "http://example.com", nil, { "HTTP_ACCEPT_LANGUAGE" => "de" }
+      get "http://example.com" , nil, {"HTTP_ACCEPT_LANGUAGE" => "de"}
       last_response.should be_redirect
       last_response.location.should eql("http://de.example.com")
     end
@@ -282,9 +282,9 @@ describe Rack::I18nLocaleSwitcher do
 
     it "should redirect if the locale was set by other means" do
       {
-        "http://example.com/en" => "http://example.com?locale=en",
-        "http://de.example.com/foo/bar" => "http://example.com/foo/bar?locale=de",
-        "http://example.com/de" => "http://example.com?locale=de",
+        "http://example.com/en"           => "http://example.com?locale=en",
+        "http://de.example.com/foo/bar"   => "http://example.com/foo/bar?locale=de",
+        "http://example.com/de"           => "http://example.com?locale=de",
         "http://en.example.com?locale=de" => "http://example.com?locale=de"
       }.each do |url, redirect_url|
         get url
@@ -294,7 +294,7 @@ describe Rack::I18nLocaleSwitcher do
     end
 
     it "should redirect if the locale was set with an accept header" do
-      get "http://example.com", nil, { "HTTP_ACCEPT_LANGUAGE" => "de" }
+      get "http://example.com" , nil, {"HTTP_ACCEPT_LANGUAGE" => "de"}
       last_response.should be_redirect
       last_response.location.should eql("http://example.com?locale=de")
     end
@@ -315,9 +315,9 @@ describe Rack::I18nLocaleSwitcher do
       end
 
       it "should not redirect if the path is exempt" do
-        ["http://example.com/assets",
-         "http://de.example.com/assets/foo/bar",
-         "http://example.com/assets/"
+        [ "http://example.com/assets",
+          "http://de.example.com/assets/foo/bar",
+          "http://example.com/assets/"
         ].each do |url|
           get url
           last_response.should_not be_redirect
