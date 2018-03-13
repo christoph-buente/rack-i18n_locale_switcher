@@ -1,19 +1,23 @@
 require 'i18n'
+require 'rack/utils'
 
 module Rack
   class I18nLocaleSwitcher
-    
+    include ::Rack::Utils
+
     LOCALE_PATTERN = '([a-zA-Z]{2,3})(-[a-zA-Z]{2,3})?'.freeze
     
-    SOURCES   = [ :param, :path, :host, :header ].freeze
+    SOURCES   = [ :param, :path, :host, :header, :cookie ].freeze
     REDIRECTS = [ :param, :path, :host ].freeze
     
     DEFAULT_OPTIONS = {
-      :param     => 'locale',
-      :source    => SOURCES,
-      :redirect  => nil,
-      :canonical => false,
-      :except    => nil
+      :param          => 'locale',
+      :cookie         => 'locale',
+      :source         => SOURCES,
+      :redirect       => nil,
+      :canonical      => false,
+      :except         => nil,
+      :save_to_cookie => false
     }.freeze
 
     def initialize(app, options = {})
@@ -27,13 +31,15 @@ module Rack
       
       options = DEFAULT_OPTIONS.merge(options)
 
-      @param     = options[:param]
-      @canonical = options[:canonical]
-      @except    = options[:except]
+      @save_to_cookie = options[:save_to_cookie]
+      @cookie         = options[:cookie]
+      @param          = options[:param]
+      @canonical      = options[:canonical]
+      @except         = options[:except]
 
       @sources = options[:source]      
       @sources = Array(@sources) unless @sources.is_a?(Array)
-      
+
       invalid_sources = @sources - SOURCES
 
       if invalid_sources.any?
@@ -49,11 +55,11 @@ module Rack
 
     def call(env)
       return @app.call(env) if env['PATH_INFO'] =~ @except
-      
+
       I18n.locale = I18n.default_locale
-    
+
       env['PATH_INFO'].gsub!(/([^\/])\/$/, '\1')
-    
+
       request = Rack::Request.new(env)
       request_url = request.url
 
@@ -65,19 +71,25 @@ module Rack
           I18n.locale = locale
         end
       end
-    
+
       if @redirect
         unless @canonical && I18n.locale == I18n.default_locale
           send(:"set_locale_in_#@redirect", env)
         end
-      
+
         if request.url != request_url
           env['PATH_INFO'] = '' if env['PATH_INFO'] == '/'
           return [ 301, { 'Location' => request.url }, ["Redirecting"]]
         end
       end
-      
-      @app.call(env)
+
+      if @save_to_cookie
+        status, headers, body, *rest = @app.call(env)
+         save_locale_in_cookies(headers) if @save_to_cookie
+        [status, headers, body, *rest]
+      else
+        @app.call(env)
+      end
     end
 
     private
@@ -123,6 +135,13 @@ module Rack
       locale
     end
 
+    def extract_locale_from_cookie(env)
+      return unless (env_cookies = parse_cookies(env))
+      return unless (cookie = env_cookies[@cookie])
+      return unless Regexp.new(LOCALE_PATTERN).match(cookie)
+      available_locale($1, $2)
+    end
+
     def set_locale_in_param(env)
       env['QUERY_STRING'] << '&' unless env['QUERY_STRING'].empty?
       env['QUERY_STRING'] << "#{ @param }=#{ I18n.locale }"
@@ -136,12 +155,27 @@ module Rack
       env['HTTP_HOST']   = "#{ I18n.locale }.#{ env['HTTP_HOST'] }"
       env['SERVER_NAME'] = "#{ I18n.locale }.#{ env['SERVER_NAME'] }"
     end
-    
+
+    def save_locale_in_cookies(headers)
+      set_cookie_header!(headers, @cookie, I18n.locale)
+    end
+
     def available_locale(language, region)
       if language
         locale = :"#{ language.downcase }#{ (region || '').upcase }"
         locale if I18n.available_locales.include?(locale)
       end
+    end
+
+    HTTP_COOKIE = 'HTTP_COOKIE'.freeze
+
+    def parse_cookies(env)
+      parse_cookies_header env[HTTP_COOKIE]
+    end
+
+    def parse_cookies_header(header)
+      cookies = parse_query(header, ';,') { |s| unescape(s) rescue s }
+      cookies.each_with_object({}) { |(k,v), hash| hash[k] = Array === v ? v.first : v }
     end
   end
 end
