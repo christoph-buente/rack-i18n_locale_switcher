@@ -86,6 +86,17 @@ describe Rack::I18nLocaleSwitcher do
       I18n.locale.should eql(:es)
     end
 
+    it 'should not change the query string unless redirect is used' do
+      get "http://example.com?locale=de"
+      last_request.env['QUERY_STRING'].should eql('locale=de')
+
+      get "http://example.com?locale=en-US"
+      last_request.env['QUERY_STRING'].should eql('locale=en-US')
+
+      get "http://example.com/some/path?foo=bar&locale=es&param=value"
+      last_request.env['QUERY_STRING'].should eql('foo=bar&locale=es&param=value')
+    end
+
     it "should not set an unavailable locale" do
       get "http://example.com?locale=xx"
       I18n.locale.should eql(I18n.default_locale)
@@ -113,6 +124,14 @@ describe Rack::I18nLocaleSwitcher do
       get "http://example.com/en-us"
       I18n.locale.should eql(:'en-US')
     end
+
+    it 'should not change path if not using redirect' do
+      get "http://example.com/de/some/path/"
+      last_request.env['PATH_INFO'].should eql('/de/some/path/')
+
+      get "http://example.com/en-us"
+      last_request.env['PATH_INFO'].should eql('/en-us')
+    end
   end
 
   context "from host" do
@@ -123,6 +142,17 @@ describe Rack::I18nLocaleSwitcher do
 
       get "http://de-de.example.com/"
       I18n.locale.should eql(:'de-DE')
+    end
+
+    it "should not change host if not using redirect" do
+      get "http://de.example.com/"
+      last_request.env['SERVER_NAME'].should eql('de.example.com')
+      last_request.env['HTTP_HOST'].should eql('de.example.com')
+
+      get "http://de-de.example.com/"
+      I18n.locale.should eql(:'de-DE')
+      last_request.env['SERVER_NAME'].should eql('de-de.example.com')
+      last_request.env['HTTP_HOST'].should eql('de-de.example.com')
     end
   end
 
