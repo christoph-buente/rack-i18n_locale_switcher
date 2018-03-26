@@ -91,8 +91,8 @@ module Rack
     
     def extract_locale_from_param(env)
       query_string = env['QUERY_STRING'].gsub(/\b#{ @param }=#{ LOCALE_PATTERN }(?:&|$)/, '')
-
-      if locale = available_locale($1, $2)
+      locale = available_locale($1, $2)
+      if locale && @redirect
         env['QUERY_STRING'] = query_string.gsub(/&$/, '')        
       end
       locale
@@ -100,8 +100,8 @@ module Rack
 
     def extract_locale_from_path(env)
       path_info = env['PATH_INFO'].gsub(/^\/#{ LOCALE_PATTERN }\b/, '')
-
-      if locale = available_locale($1, $2)
+      locale = available_locale($1, $2)
+      if locale && @redirect
         env['PATH_INFO'] = path_info
       end
       locale
@@ -111,8 +111,8 @@ module Rack
       env['HTTP_HOST'] ||= "#{ env['SERVER_NAME'] }:#{ env['SERVER_PORT'] }"            
 
       http_host = env['HTTP_HOST'].gsub(/^#{ LOCALE_PATTERN }\./, '')
-
-      if locale = available_locale($1, $2)
+      locale = available_locale($1, $2)
+      if locale && @redirect
         env['HTTP_HOST']   = http_host
         env['SERVER_NAME'] = http_host.gsub(/:\d+$/, '')
       end
